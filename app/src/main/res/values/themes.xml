@@ -1,9 +1,20 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.NeoTaskManager" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+         <item name="backgroundColor">@color/white</item>
     </style>
 
+    <style name="BasicTextStyle">
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">@font/mukta</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="BottomNavStyle" parent="Widget.Design.BottomNavigationView">
+        <item name="itemIconTint">@color/white</item>
+        <item name="itemTextColor">@color/white</item>
+        <item name="android:background">@color/light_black</item>
+        <item name="itemIconSize">30sp</item>
+        <item name="android:layout_gravity">center|left</item>
+    </style>
     <style name="Theme.NeoTaskManager" parent="Base.Theme.NeoTaskManager" />
 </resources>
