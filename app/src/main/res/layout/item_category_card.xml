@@ -15,6 +15,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/card"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingVertical="16dp"
@@ -33,9 +34,10 @@
 
             <Spinner
                 android:id="@+id/spinner"
-                android:layout_width="50dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                tools:listitem="@layout/item_circle"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -43,11 +45,11 @@
                 android:id="@+id/star"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@+id/category_name"
+                app:layout_constraintEnd_toStartOf="@+id/btn_delete"
+                app:layout_constraintTop_toTopOf="@+id/category_name"
                 app:srcCompat="@drawable/icon_star" />
 
             <androidx.cardview.widget.CardView
@@ -91,6 +93,27 @@
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="@+id/category_name"
                 app:layout_constraintTop_toBottomOf="@+id/card_tasks_in_process" />
+
+            <ImageView
+                android:id="@+id/btn_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/star"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/star"
+                app:srcCompat="@drawable/trash" />
+
+            <ImageView
+                android:id="@+id/btn_save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintBottom_toBottomOf="@+id/category_name"
+                app:layout_constraintEnd_toStartOf="@+id/star"
+                app:layout_constraintTop_toTopOf="@+id/category_name"
+                app:srcCompat="@drawable/baseline_save_24" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

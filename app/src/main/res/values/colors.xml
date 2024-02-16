@@ -6,4 +6,11 @@
     <color name="yellow">#F0E822</color>
     <color name="light_black">#383838</color>
     <color name="grey">#CBCBCB</color>
+    <color name="aesthetic1">#EE82EE</color> <!-- Лавандовый -->
+    <color name="aesthetic2">#6495ED</color> <!-- Голубой -->
+    <color name="aesthetic3">#FF7F50</color> <!-- Коралловый -->
+    <color name="aesthetic4">#20B2AA</color> <!-- Морская волна -->
+    <color name="aesthetic5">#FFA07A</color> <!-- Светло-бежевый -->
+    <color name="aesthetic6">#7B68EE</color> <!-- Синий -->
+    <color name="aesthetic7">#00FA9A</color> <!-- Турецкий -->
 </resources>

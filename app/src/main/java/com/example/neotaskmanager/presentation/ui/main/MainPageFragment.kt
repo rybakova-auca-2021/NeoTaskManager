@@ -159,11 +159,11 @@ class MainPageFragment : Fragment() {
     private fun setupAdapterClicks() {
         adapter.setOnItemClickListener(object : CategoryAdapter.OnItemClickListener {
             override fun onTaskItemClick(item: Task?) {
-                TODO("Not yet implemented")
+                println("clicked")
             }
 
             override fun onSpinnerClickListener() {
-                TODO("Not yet implemented")
+                println("on spinner clicked")
             }
         })
     }
