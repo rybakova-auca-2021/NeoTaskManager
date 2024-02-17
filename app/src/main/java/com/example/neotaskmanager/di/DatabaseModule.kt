@@ -5,6 +5,7 @@ import com.example.neotaskmanager.data.repository.TaskRepository
 import com.example.neotaskmanager.data.repository.TaskRepositoryImpl
 import com.example.neotaskmanager.data.source.TaskDao
 import com.example.neotaskmanager.data.source.TaskDatabase
+import com.example.neotaskmanager.presentation.ui.main.GetTasksViewModel
 import com.example.neotaskmanager.presentation.ui.main.MainPageViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.GlobalContext.loadKoinModules
@@ -32,4 +33,5 @@ val repositoryModule = module {
 
 val viewModelModule = module {
     viewModel { MainPageViewModel(get()) }
+    viewModel { GetTasksViewModel(get()) }
 }

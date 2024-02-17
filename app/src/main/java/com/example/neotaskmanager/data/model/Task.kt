@@ -17,23 +17,23 @@ data class Task (
     val id: Long = 0,
     val category: String? = null,
     val isSaved: Boolean? = null,
-    val subTasks: @RawValue List<TaskData>? = null
+    val subTasks: @RawValue MutableList<TaskData>? = null
 ) : Parcelable
 
 data class TaskData(
-    val title: String,
-    val completed: Boolean
+    val title: String?,
+    val completed: Boolean?
 )
 
 class Converters {
     @TypeConverter
-    fun fromJson(value: String): List<TaskData> {
-        val listType = object : TypeToken<List<TaskData>>() {}.type
+    fun fromJson(value: String): MutableList<TaskData> {
+        val listType = object : TypeToken<MutableList<TaskData>>() {}.type
         return Gson().fromJson(value, listType)
     }
 
     @TypeConverter
-    fun toJson(list: List<TaskData>): String {
+    fun toJson(list: MutableList<TaskData>): String {
         return Gson().toJson(list)
     }
 }

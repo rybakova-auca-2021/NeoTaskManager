@@ -7,5 +7,5 @@ interface TaskRepository {
     suspend fun update(task: Task)
     suspend fun delete(task: Task)
     suspend fun getCategories(): List<String>
-    suspend fun allTasks(): List<Task?>?
+    suspend fun allTasks(): MutableList<Task?>?
 }

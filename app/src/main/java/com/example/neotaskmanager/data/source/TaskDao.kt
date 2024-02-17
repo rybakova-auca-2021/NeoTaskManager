@@ -20,7 +20,7 @@ interface TaskDao {
     fun delete(task: Task?)
 
     @Query("SELECT * FROM tasks")
-    suspend fun allTasks(): List<Task?>?
+    suspend fun allTasks(): MutableList<Task?>?
 
     @Query("SELECT DISTINCT category FROM tasks")
     suspend fun getCategories(): List<String>
