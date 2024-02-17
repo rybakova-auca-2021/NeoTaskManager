@@ -5,12 +5,16 @@ import android.text.Editable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.neotaskmanager.R
 import com.example.neotaskmanager.data.model.TaskData
 import com.example.neotaskmanager.databinding.ItemCardTaskBinding
+import java.util.Collections
 
-class TaskAdapter(var items: MutableList<TaskData>) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
+class TaskAdapter(var items: MutableList<TaskData>) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>(){
+
+    private var itemTouchHelper: ItemTouchHelper? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -46,5 +50,38 @@ class TaskAdapter(var items: MutableList<TaskData>) : RecyclerView.Adapter<TaskA
 
     fun String?.toEditable(): Editable? {
         return this?.let { Editable.Factory.getInstance().newEditable(this) }
+    }
+
+    fun attachItemTouchHelper(recyclerView: RecyclerView) {
+        itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                val fromPosition = viewHolder.adapterPosition
+                val toPosition = target.adapterPosition
+                if (fromPosition < toPosition) {
+                    for (i in fromPosition until toPosition) {
+                        Collections.swap(items, i, i + 1)
+                    }
+                } else {
+                    for (i in fromPosition downTo toPosition + 1) {
+                        Collections.swap(items, i, i - 1)
+                    }
+                }
+
+                notifyItemMoved(fromPosition, toPosition)
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            }
+        })
+
+        itemTouchHelper?.attachToRecyclerView(recyclerView)
     }
 }

@@ -12,8 +12,9 @@ import com.example.neotaskmanager.data.model.Task
 import com.example.neotaskmanager.data.model.TaskData
 import com.example.neotaskmanager.databinding.ItemCategoryCardBinding
 
-class CategoryAdapter(var items: MutableList<Task?>) : RecyclerView.Adapter<CategoryAdapter.TaskViewHolder>() {
+class CategoryAdapter(var items: MutableList<Task?>) : RecyclerView.Adapter<CategoryAdapter.TaskViewHolder>(){
     private var itemClickListener: OnItemClickListener? = null
+
 
     fun setOnItemClickListener(listener: OnItemClickListener) {
         itemClickListener = listener
@@ -41,6 +42,7 @@ class CategoryAdapter(var items: MutableList<Task?>) : RecyclerView.Adapter<Cate
             val taskAdapter = TaskAdapter(mutableListOf())
             binding.rvTasks.layoutManager = LinearLayoutManager(binding.root.context)
             binding.rvTasks.adapter = taskAdapter
+            taskAdapter.attachItemTouchHelper(binding.rvTasks)
 
             binding.root.setOnClickListener {
                 val position = adapterPosition
@@ -49,9 +51,6 @@ class CategoryAdapter(var items: MutableList<Task?>) : RecyclerView.Adapter<Cate
                     itemClickListener?.onTaskItemClick(clickedItem)
                 }
             }
-
-            binding.rvTasks.layoutManager = LinearLayoutManager(binding.root.context)
-            binding.rvTasks.adapter = taskAdapter
 
             binding.categoryName.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
