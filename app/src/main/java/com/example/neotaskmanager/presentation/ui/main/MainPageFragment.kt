@@ -1,6 +1,5 @@
 package com.example.neotaskmanager.presentation.ui.main
 
-import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.util.Log
@@ -18,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.neotaskmanager.R
 import com.example.neotaskmanager.data.model.Task
-import com.example.neotaskmanager.data.model.TaskData
 import com.example.neotaskmanager.databinding.FragmentMainPageBinding
 import com.example.neotaskmanager.presentation.MainActivity
 import com.google.android.material.snackbar.Snackbar
@@ -36,7 +34,6 @@ class MainPageFragment : Fragment() {
     private val taskViewModel: GetTasksViewModel by viewModel()
     private lateinit var mPicker: DayScrollDatePicker
     private lateinit var adapter: CategoryAdapter
-    private lateinit var taskAdapter: TaskAdapter
     private lateinit var recyclerView: RecyclerView
 
 
@@ -67,8 +64,6 @@ class MainPageFragment : Fragment() {
         adapter = CategoryAdapter(mutableListOf())
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.rvTasks.adapter = adapter
-
-        taskAdapter = TaskAdapter(mutableListOf())
     }
 
     private fun setupNavigation() {
@@ -159,25 +154,12 @@ class MainPageFragment : Fragment() {
         adapter.items.add(emptyTask)
         adapter.notifyItemInserted(adapter.items.size - 1)
         binding.textNoTasks.visibility = View.GONE
-
-    }
-
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun addEmptyTask() {
-        val emptyTask = TaskData(title = "привет", completed = false)
-        taskAdapter.items.add(emptyTask)
-        taskAdapter.notifyDataSetChanged()
     }
 
     private fun setupAdapterClicks() {
         adapter.setOnItemClickListener(object : CategoryAdapter.OnItemClickListener {
             override fun onTaskItemClick(item: Task?) {
                 TODO("Not yet implemented")
-            }
-
-            override fun onAddTaskClick() {
-                addEmptyTask()
             }
 
             override fun onSpinnerClickListener() {

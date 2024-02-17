@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.neotaskmanager.data.model.Task
+import com.example.neotaskmanager.data.model.TaskData
 import com.example.neotaskmanager.databinding.ItemCategoryCardBinding
 
 class CategoryAdapter(var items: MutableList<Task?>) : RecyclerView.Adapter<CategoryAdapter.TaskViewHolder>() {
@@ -20,7 +21,6 @@ class CategoryAdapter(var items: MutableList<Task?>) : RecyclerView.Adapter<Cate
 
     interface OnItemClickListener {
         fun onTaskItemClick(item: Task?)
-        fun onAddTaskClick()
         fun onSpinnerClickListener()
     }
 
@@ -36,9 +36,12 @@ class CategoryAdapter(var items: MutableList<Task?>) : RecyclerView.Adapter<Cate
     }
 
     inner class TaskViewHolder(private val binding: ItemCategoryCardBinding) : RecyclerView.ViewHolder(binding.root) {
-        private val taskAdapter = TaskAdapter(mutableListOf())
 
         init {
+            val taskAdapter = TaskAdapter(mutableListOf())
+            binding.rvTasks.layoutManager = LinearLayoutManager(binding.root.context)
+            binding.rvTasks.adapter = taskAdapter
+
             binding.root.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
@@ -62,8 +65,10 @@ class CategoryAdapter(var items: MutableList<Task?>) : RecyclerView.Adapter<Cate
             })
 
             binding.addTaskBtn.setOnClickListener {
-                binding.rvTasks.visibility = View.VISIBLE
-                itemClickListener?.onAddTaskClick()
+                binding.cardTasksInProcess.visibility = View.VISIBLE
+                val emptyTask = TaskData("", false)
+                taskAdapter.items.add(emptyTask)
+                taskAdapter.notifyItemInserted(taskAdapter.items.size - 1)
             }
         }
 
