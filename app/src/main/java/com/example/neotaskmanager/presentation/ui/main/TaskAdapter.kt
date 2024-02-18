@@ -2,6 +2,7 @@ package com.example.neotaskmanager.presentation.ui.main
 
 import android.graphics.Paint
 import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -35,8 +36,29 @@ class TaskAdapter(var items: MutableList<TaskData?>) : RecyclerView.Adapter<Task
     inner class TaskViewHolder(private val binding: ItemCardTaskBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
+        init {
+            binding.etTask.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    val position = adapterPosition
+                    if (position != RecyclerView.NO_POSITION) {
+                        items[position] = TaskData(0, s.toString(), false)
+                    }
+                }
+
+
+                override fun afterTextChanged(s: Editable?) {}
+            })
+        }
+
         fun bind(task: TaskData?) {
             binding.etTask.text = task?.title.toEditable()
+            if (task?.completed == true) {
+                binding.etTask.setTextColor(ContextCompat.getColor(binding.root.context, R.color.grey))
+                binding.etTask.paintFlags = binding.etTask.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            }
+            binding.checkBox.isChecked = task?.completed == true
             binding.checkBox.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     binding.etTask.setTextColor(ContextCompat.getColor(binding.root.context, R.color.grey))
