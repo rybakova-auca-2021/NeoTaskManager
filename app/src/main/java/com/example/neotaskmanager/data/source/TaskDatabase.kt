@@ -9,8 +9,9 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.neotaskmanager.data.model.Converters
 import com.example.neotaskmanager.data.model.Task
+import com.example.neotaskmanager.data.model.TaskData
 
-@Database(entities = [Task::class], version = 2, exportSchema = false)
+@Database(entities = [Task::class, TaskData::class], version = 4, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class TaskDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao?

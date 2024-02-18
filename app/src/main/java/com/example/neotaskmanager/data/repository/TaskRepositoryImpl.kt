@@ -7,19 +7,39 @@ import kotlinx.coroutines.withContext
 
 class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
     override suspend fun insert(task: Task) {
-        withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO) {
             taskDao.insert(task)
         }
     }
 
     override suspend fun update(task: Task) {
-        taskDao.update(task)
+        withContext(Dispatchers.IO) {
+            taskDao.update(task)
+        }
     }
 
     override suspend fun delete(taskId: Long) {
         withContext(Dispatchers.IO) {
-            taskDao.delete(taskId)
+            val task = taskDao.getTaskById(taskId)
+            task?.let {
+                it.isDeleted = true
+                taskDao.update(it)
+            }
         }
+    }
+
+    override suspend fun restoreTask(taskId: Long) {
+        withContext(Dispatchers.IO) {
+            val task = taskDao.getTaskById(taskId)
+            task?.let {
+                it.isDeleted = false
+                taskDao.update(it)
+            }
+        }
+    }
+
+    override suspend fun deletedTasks(): MutableList<Task?>? {
+        return taskDao.deletedTasks()
     }
 
     override suspend fun getCategories(): List<String> {

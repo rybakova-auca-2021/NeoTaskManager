@@ -11,4 +11,10 @@ class DeleteTaskViewModel(private val repository: TaskRepository) : ViewModel() 
             repository.delete(taskId)
         }
     }
+
+    fun restoreTask(taskId: Long) {
+        viewModelScope.launch {
+            repository.restoreTask(taskId)
+        }
+    }
 }

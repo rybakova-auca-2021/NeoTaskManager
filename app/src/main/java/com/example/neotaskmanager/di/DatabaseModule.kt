@@ -3,6 +3,7 @@ package com.example.neotaskmanager.di
 import com.example.neotaskmanager.data.repository.TaskRepository
 import com.example.neotaskmanager.data.repository.TaskRepositoryImpl
 import com.example.neotaskmanager.data.source.TaskDatabase
+import com.example.neotaskmanager.presentation.ui.basket.GetDeletedTaskViewModel
 import com.example.neotaskmanager.presentation.ui.main.DeleteTaskViewModel
 import com.example.neotaskmanager.presentation.ui.main.GetCategoriesViewModel
 import com.example.neotaskmanager.presentation.ui.main.GetTasksViewModel
@@ -37,4 +38,5 @@ val viewModelModule = module {
     viewModel { GetTasksViewModel(get()) }
     viewModel { InsertTaskViewModel(get()) }
     viewModel { DeleteTaskViewModel(get()) }
+    viewModel { GetDeletedTaskViewModel(get()) }
 }

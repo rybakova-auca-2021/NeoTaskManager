@@ -174,12 +174,12 @@ class MainPageFragment : Fragment() {
                         deleteTaskViewModel.deleteTask(it.id)
                     }
                 }
-                Snackbar.make(binding.root, "Заметка отправлена в корзину", Snackbar.LENGTH_INDEFINITE)
+                Snackbar.make(binding.root, "Заметка отправлена в корзину", Snackbar.LENGTH_SHORT)
                     .setActionTextColor(ContextCompat.getColor(requireContext(), R.color.yellow))
                     .setAction("Отменить") {
                         lifecycleScope.launch {
                             if (item != null) {
-                                insertTaskViewModel.insertTask(item)
+                                deleteTaskViewModel.restoreTask(item.id)
                             }
                             adapter.items.add(item)
                             adapter.notifyItemInserted(adapter.items.size - 1)
