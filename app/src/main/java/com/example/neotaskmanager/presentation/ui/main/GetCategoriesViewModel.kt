@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.neotaskmanager.data.repository.TaskRepository
 import kotlinx.coroutines.launch
 
-class MainPageViewModel(private val repository: TaskRepository) : ViewModel() {
+class GetCategoriesViewModel(private val repository: TaskRepository) : ViewModel() {
 
     private val _result = MutableLiveData<Result<List<String>>>()
     val result: LiveData<Result<List<String>>>

@@ -30,8 +30,10 @@ import java.util.Locale
 class MainPageFragment : Fragment() {
     private var _binding: FragmentMainPageBinding? = null
     private val binding: FragmentMainPageBinding get() = _binding!!
-    private val viewModel: MainPageViewModel by viewModel()
+    private val viewModel: GetCategoriesViewModel by viewModel()
     private val taskViewModel: GetTasksViewModel by viewModel()
+    private val insertTaskViewModel: InsertTaskViewModel by viewModel()
+    private val deleteTaskViewModel: DeleteTaskViewModel by viewModel()
     private lateinit var mPicker: DayScrollDatePicker
     private lateinit var adapter: CategoryAdapter
     private lateinit var recyclerView: RecyclerView
@@ -61,7 +63,7 @@ class MainPageFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = CategoryAdapter(mutableListOf())
+        adapter = CategoryAdapter(mutableListOf(), insertTaskViewModel, deleteTaskViewModel, viewLifecycleOwner.lifecycleScope)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.rvTasks.adapter = adapter
     }

@@ -16,8 +16,8 @@ interface TaskDao {
     @Update
     fun update(task: Task?)
 
-    @Delete
-    fun delete(task: Task?)
+    @Query("DELETE FROM tasks WHERE id = :taskId")
+    fun delete(taskId: Long)
 
     @Query("SELECT * FROM tasks")
     suspend fun allTasks(): MutableList<Task?>?

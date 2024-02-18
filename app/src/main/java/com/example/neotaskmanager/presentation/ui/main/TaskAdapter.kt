@@ -5,6 +5,7 @@ import android.text.Editable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.neotaskmanager.R
@@ -12,7 +13,7 @@ import com.example.neotaskmanager.data.model.TaskData
 import com.example.neotaskmanager.databinding.ItemCardTaskBinding
 import java.util.Collections
 
-class TaskAdapter(var items: MutableList<TaskData>) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>(){
+class TaskAdapter(var items: MutableList<TaskData?>) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>(){
 
     private var itemTouchHelper: ItemTouchHelper? = null
 
@@ -34,8 +35,8 @@ class TaskAdapter(var items: MutableList<TaskData>) : RecyclerView.Adapter<TaskA
     inner class TaskViewHolder(private val binding: ItemCardTaskBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(task: TaskData) {
-            binding.etTask.text = task.title.toEditable()
+        fun bind(task: TaskData?) {
+            binding.etTask.text = task?.title.toEditable()
             binding.checkBox.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     binding.etTask.setTextColor(ContextCompat.getColor(binding.root.context, R.color.grey))
@@ -46,6 +47,17 @@ class TaskAdapter(var items: MutableList<TaskData>) : RecyclerView.Adapter<TaskA
                 }
             }
         }
+    }
+
+    fun updateData(newList: MutableList<TaskData?>) {
+        val diffResult = DiffUtil.calculateDiff(
+            DisplayableItemDiffCallback(
+                items,
+                newList
+            )
+        )
+        items = newList
+        diffResult.dispatchUpdatesTo(this)
     }
 
     fun String?.toEditable(): Editable? {
@@ -83,5 +95,23 @@ class TaskAdapter(var items: MutableList<TaskData>) : RecyclerView.Adapter<TaskA
         })
 
         itemTouchHelper?.attachToRecyclerView(recyclerView)
+    }
+
+    class DisplayableItemDiffCallback(
+        private val oldList: List<TaskData?>,
+        private val newList: List<TaskData?>
+    ) : DiffUtil.Callback() {
+
+        override fun getOldListSize() = oldList.size
+
+        override fun getNewListSize() = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition] == newList[newItemPosition]
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition] == newList[newItemPosition]
+        }
     }
 }

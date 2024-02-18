@@ -1,6 +1,5 @@
 package com.example.neotaskmanager.presentation.ui.main
 
-import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -9,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,8 +16,9 @@ import com.example.neotaskmanager.R
 import com.example.neotaskmanager.data.model.Task
 import com.example.neotaskmanager.data.model.TaskData
 import com.example.neotaskmanager.databinding.ItemCategoryCardBinding
+import kotlinx.coroutines.launch
 
-class CategoryAdapter(var items: MutableList<Task?>) : RecyclerView.Adapter<CategoryAdapter.TaskViewHolder>(){
+class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: InsertTaskViewModel, val deleteViewModel: DeleteTaskViewModel, private val lifecycleScope: LifecycleCoroutineScope) : RecyclerView.Adapter<CategoryAdapter.TaskViewHolder>(){
     private var itemClickListener: OnItemClickListener? = null
 
 
@@ -43,6 +44,7 @@ class CategoryAdapter(var items: MutableList<Task?>) : RecyclerView.Adapter<Cate
 
     inner class TaskViewHolder(private val binding: ItemCategoryCardBinding) : RecyclerView.ViewHolder(binding.root) {
         var isClicked = true
+        var color: Int? = null
         init {
             val taskAdapter = TaskAdapter(mutableListOf())
             binding.rvTasks.layoutManager = LinearLayoutManager(binding.root.context)
@@ -65,6 +67,19 @@ class CategoryAdapter(var items: MutableList<Task?>) : RecyclerView.Adapter<Cate
             }
 
             binding.spinner.adapter = adapter
+            binding.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    color = spinnerItems[position]
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
 
             binding.root.setOnClickListener {
                 val position = adapterPosition
@@ -74,9 +89,6 @@ class CategoryAdapter(var items: MutableList<Task?>) : RecyclerView.Adapter<Cate
                     val drawable = ContextCompat.getDrawable(binding.root.context, R.drawable.rounded_red_card_background)
                     binding.card.background = drawable
                     binding.btnDelete.visibility = View.VISIBLE
-                    binding.btnDelete.setOnClickListener {
-                        deleteItem(position)
-                    }
                 }
             }
 
@@ -111,11 +123,47 @@ class CategoryAdapter(var items: MutableList<Task?>) : RecyclerView.Adapter<Cate
                     isClicked = !isClicked
                 }
             }
+
+            binding.btnSave.setOnClickListener {
+                val category = binding.categoryName.text.toString()
+                val categoryColor = color
+                val subTasks = taskAdapter.items
+                val task = Task(0, category, categoryColor, subTasks)
+
+                lifecycleScope.launch {
+                    insertViewModel.insertTask(task)
+                }
+            }
+
         }
 
         fun bind(item: Task?) {
+            val taskAdapter = TaskAdapter(mutableListOf())
+            binding.rvTasks.layoutManager = LinearLayoutManager(binding.root.context)
+            binding.rvTasks.adapter = taskAdapter
 
+            binding.addTaskBtn.setOnClickListener {
+                binding.cardTasksInProcess.visibility = View.VISIBLE
+                val emptyTask = TaskData("", false)
+                taskAdapter.items.add(emptyTask)
+                taskAdapter.notifyItemInserted(taskAdapter.items.size - 1)
+
+            }
+            binding.btnDelete.setOnClickListener {
+                lifecycleScope.launch {
+                    if (item != null) {
+                        deleteViewModel.deleteTask(item.id)
+                        deleteItem(position)
+                    }
+                }
+            }
+            item?.subTasks?.let { taskAdapter.updateData(it) }
+            binding.categoryName.text = item?.category.toEditable()
         }
+    }
+
+    fun String?.toEditable(): Editable? {
+        return this?.let { Editable.Factory.getInstance().newEditable(this) }
     }
 
     fun moveToTop(position: Int) {

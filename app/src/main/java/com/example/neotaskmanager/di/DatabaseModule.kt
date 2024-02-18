@@ -1,12 +1,13 @@
 package com.example.neotaskmanager.di
 
-import androidx.room.Room
 import com.example.neotaskmanager.data.repository.TaskRepository
 import com.example.neotaskmanager.data.repository.TaskRepositoryImpl
-import com.example.neotaskmanager.data.source.TaskDao
 import com.example.neotaskmanager.data.source.TaskDatabase
+import com.example.neotaskmanager.presentation.ui.main.DeleteTaskViewModel
+import com.example.neotaskmanager.presentation.ui.main.GetCategoriesViewModel
 import com.example.neotaskmanager.presentation.ui.main.GetTasksViewModel
-import com.example.neotaskmanager.presentation.ui.main.MainPageViewModel
+import com.example.neotaskmanager.presentation.ui.main.InsertTaskViewModel
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.GlobalContext.loadKoinModules
 import org.koin.dsl.module
@@ -23,7 +24,7 @@ private val loadFeature by lazy {
 }
 
 val databaseModule = module {
-    single { Room.databaseBuilder(get(),TaskDatabase::class.java, "task_database").build() }
+    single { TaskDatabase.getInstance(androidContext()) }
     single { get<TaskDatabase>().taskDao() }
 }
 
@@ -32,6 +33,8 @@ val repositoryModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { MainPageViewModel(get()) }
+    viewModel { GetCategoriesViewModel(get()) }
     viewModel { GetTasksViewModel(get()) }
+    viewModel { InsertTaskViewModel(get()) }
+    viewModel { DeleteTaskViewModel(get()) }
 }
