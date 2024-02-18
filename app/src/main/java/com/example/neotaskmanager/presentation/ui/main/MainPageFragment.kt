@@ -167,6 +167,26 @@ class MainPageFragment : Fragment() {
             override fun onSpinnerClickListener() {
                 println("on spinner clicked")
             }
+
+            override fun onDeleteClick(item: Task?) {
+                lifecycleScope.launch {
+                    item?.let {
+                        deleteTaskViewModel.deleteTask(it.id)
+                    }
+                }
+                Snackbar.make(binding.root, "Заметка отправлена в корзину", Snackbar.LENGTH_INDEFINITE)
+                    .setActionTextColor(ContextCompat.getColor(requireContext(), R.color.yellow))
+                    .setAction("Отменить") {
+                        lifecycleScope.launch {
+                            if (item != null) {
+                                insertTaskViewModel.insertTask(item)
+                            }
+                            adapter.items.add(item)
+                            adapter.notifyItemInserted(adapter.items.size - 1)
+                        }
+                    }
+                .show()
+            }
         })
     }
 

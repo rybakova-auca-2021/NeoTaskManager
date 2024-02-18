@@ -29,6 +29,7 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
     interface OnItemClickListener {
         fun onTaskItemClick(item: Task?)
         fun onSpinnerClickListener()
+        fun onDeleteClick(item: Task?)
     }
 
     fun updateData(newList: MutableList<Task?>) {
@@ -45,17 +46,46 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
     inner class TaskViewHolder(private val binding: ItemCategoryCardBinding) : RecyclerView.ViewHolder(binding.root) {
         var isClicked = true
         var color: Int? = null
-        init {
-            val taskAdapter = TaskAdapter(mutableListOf())
-            binding.rvTasks.layoutManager = LinearLayoutManager(binding.root.context)
-            binding.rvTasks.adapter = taskAdapter
-            taskAdapter.attachItemTouchHelper(binding.rvTasks)
+        private val taskAdapter = TaskAdapter(mutableListOf())
 
-            // Spinner Setup
-            val spinnerItems = arrayOf(R.drawable.spinner_item_1, R.drawable.spinner_item_2, R.drawable.spinner_item_3, R.drawable.spinner_item_4, R.drawable.spinner_item_5)
-            val adapter = object : ArrayAdapter<Int>(binding.root.context, R.layout.item_circle, spinnerItems) {
+        init {
+            setupSpinner()
+            setupClickListener()
+            setupTextWatcher()
+            setupAddTaskButton()
+            setupDeleteButton()
+            setupSaveButton()
+            setupRecyclerView()
+            setupStarButton()
+        }
+
+        private fun setupStarButton() {
+            binding.star.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    if(isClicked) {
+                        binding.star.setImageResource(R.drawable.star_clicked)
+                        moveToTop(position)
+                    } else {
+                        binding.star.setImageResource(R.drawable.icon_star)
+                        moveToOriginalPosition(position)
+                    }
+                    isClicked = !isClicked
+                }
+            }
+        }
+
+        private fun setupSpinner() {
+            val spinnerItems = arrayOf(
+                R.drawable.spinner_item_1, R.drawable.spinner_item_2,
+                R.drawable.spinner_item_3, R.drawable.spinner_item_4, R.drawable.spinner_item_5
+            )
+            val adapter = object : ArrayAdapter<Int>(
+                binding.root.context, R.layout.item_circle, spinnerItems
+            ) {
                 override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                    val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_circle, parent, false)
+                    val view =
+                        convertView ?: LayoutInflater.from(context).inflate(R.layout.item_circle, parent, false)
                     val drawable = ContextCompat.getDrawable(binding.root.context, spinnerItems[position])
                     view.background = drawable
                     return view
@@ -77,10 +107,11 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
                     color = spinnerItems[position]
                 }
 
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                }
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
+        }
 
+        private fun setupClickListener() {
             binding.root.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
@@ -91,7 +122,9 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
                     binding.btnDelete.visibility = View.VISIBLE
                 }
             }
+        }
 
+        private fun setupTextWatcher() {
             binding.categoryName.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
                     val text = s.toString().trim()
@@ -102,28 +135,30 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             })
+        }
 
+        private fun setupAddTaskButton() {
             binding.addTaskBtn.setOnClickListener {
                 binding.cardTasksInProcess.visibility = View.VISIBLE
-                val emptyTask = TaskData("", false)
+                val emptyTask = TaskData(0, "your task", false)
                 taskAdapter.items.add(emptyTask)
                 taskAdapter.notifyItemInserted(taskAdapter.items.size - 1)
             }
+        }
 
-            binding.star.setOnClickListener {
+        private fun setupDeleteButton() {
+            binding.btnDelete.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    if(isClicked) {
-                        binding.star.setImageResource(R.drawable.star_clicked)
-                        moveToTop(position)
-                    } else {
-                        binding.star.setImageResource(R.drawable.icon_star)
-                        moveToOriginalPosition(position)
-                    }
-                    isClicked = !isClicked
+                    val item = items[position]
+                    itemClickListener?.onDeleteClick(item)
+                    items.removeAt(position)
+                    notifyItemRemoved(position)
                 }
             }
+        }
 
+        private fun setupSaveButton() {
             binding.btnSave.setOnClickListener {
                 val category = binding.categoryName.text.toString()
                 val categoryColor = color
@@ -134,29 +169,34 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
                     insertViewModel.insertTask(task)
                 }
             }
+        }
 
+        private fun setupRecyclerView() {
+            binding.rvTasks.layoutManager = LinearLayoutManager(binding.root.context)
+            binding.rvTasks.adapter = taskAdapter
+            taskAdapter.attachItemTouchHelper(binding.rvTasks)
         }
 
         fun bind(item: Task?) {
-            val taskAdapter = TaskAdapter(mutableListOf())
-            binding.rvTasks.layoutManager = LinearLayoutManager(binding.root.context)
-            binding.rvTasks.adapter = taskAdapter
+            binding.cardTasksInProcess.visibility = View.GONE
 
             binding.addTaskBtn.setOnClickListener {
                 binding.cardTasksInProcess.visibility = View.VISIBLE
-                val emptyTask = TaskData("", false)
+                val emptyTask = TaskData(0, "your task", false)
                 taskAdapter.items.add(emptyTask)
                 taskAdapter.notifyItemInserted(taskAdapter.items.size - 1)
 
             }
             binding.btnDelete.setOnClickListener {
-                lifecycleScope.launch {
-                    if (item != null) {
-                        deleteViewModel.deleteTask(item.id)
-                        deleteItem(position)
-                    }
-                }
+                itemClickListener?.onDeleteClick(item)
+                deleteItem(position)
             }
+            if (item?.subTasks != null) {
+                binding.cardTasksInProcess.visibility = View.VISIBLE
+            }
+            binding.rvTasks.layoutManager = LinearLayoutManager(binding.root.context)
+            binding.rvTasks.adapter = taskAdapter
+            taskAdapter.attachItemTouchHelper(binding.rvTasks)
             item?.subTasks?.let { taskAdapter.updateData(it) }
             binding.categoryName.text = item?.category.toEditable()
         }
