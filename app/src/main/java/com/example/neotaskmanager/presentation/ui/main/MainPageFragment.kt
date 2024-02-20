@@ -57,9 +57,7 @@ class MainPageFragment : Fragment() {
         setCurrentMonth()
         setupNavigation()
         getValue()
-        observeTasks()
         setupPopUpMenu()
-        setupAdapterClicks()
     }
 
     private fun setupRecyclerView() {
@@ -85,10 +83,12 @@ class MainPageFragment : Fragment() {
         binding.btnCalendar.text = currentMonth
     }
 
-    private fun observeTasks() {
-        taskViewModel.fetchTasks()
+    private fun observeTasks(currentDate: String) {
+        adapter.deleteAllItems()
+        taskViewModel.fetchTasks(currentDate)
         taskViewModel.result.observe(viewLifecycleOwner, Observer { result ->
             result.onSuccess { tasks ->
+                println("tasks: $tasks")
                 if (tasks != null) {
                     if (tasks.isEmpty()) {
                         binding.textNoTasks.visibility = View.VISIBLE
@@ -147,18 +147,19 @@ class MainPageFragment : Fragment() {
         mPicker.getSelectedDate { date ->
             date?.let {
                 val selectedDate = SimpleDateFormat("yyyy-MM-dd").format(date)
+                observeTasks(selectedDate)
+                setupAdapterClicks(selectedDate)
             }
         }
     }
-
-    fun addEmptyCard() {
+    private fun addEmptyCard() {
         val emptyTask = Task()
         adapter.items.add(emptyTask)
         adapter.notifyItemInserted(adapter.items.size - 1)
         binding.textNoTasks.visibility = View.GONE
     }
 
-    private fun setupAdapterClicks() {
+    private fun setupAdapterClicks(selectedDate: String) {
         adapter.setOnItemClickListener(object : CategoryAdapter.OnItemClickListener {
             override fun onTaskItemClick(item: Task?) {
                 println("clicked")
@@ -186,6 +187,16 @@ class MainPageFragment : Fragment() {
                         }
                     }
                 .show()
+            }
+
+            override fun onSaveClick(item: Task?) {
+                lifecycleScope.launch {
+                    if (item != null) {
+                        item.date = selectedDate
+                        println("item: $item")
+                        insertTaskViewModel.insertTask(item)
+                    }
+                }
             }
         })
     }

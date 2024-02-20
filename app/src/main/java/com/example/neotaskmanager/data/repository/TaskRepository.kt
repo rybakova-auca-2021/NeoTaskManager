@@ -9,5 +9,5 @@ interface TaskRepository {
     suspend fun restoreTask(taskId: Long)
     suspend fun deletedTasks(): MutableList<Task?>?
     suspend fun getCategories(): List<String>
-    suspend fun allTasks(): MutableList<Task?>?
+    suspend fun allTasks(currentDate: String): MutableList<Task?>?
 }

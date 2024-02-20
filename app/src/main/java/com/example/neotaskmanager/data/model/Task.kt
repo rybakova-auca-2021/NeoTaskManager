@@ -20,6 +20,7 @@ data class Task(
     val category: String? = null,
     val categoryColor: Int? = null,
     val subTasks: @RawValue MutableList<TaskData?>? = null,
+    var date: String? = null,
     var isDeleted: Boolean = false
 ) : Parcelable
 

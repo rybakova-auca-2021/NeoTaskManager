@@ -23,8 +23,8 @@ interface TaskDao {
     @Query("DELETE FROM tasks WHERE id = :taskId")
     fun delete(taskId: Long)
 
-    @Query("SELECT * FROM tasks WHERE isDeleted = 0")
-    suspend fun allTasks(): MutableList<Task?>?
+    @Query("SELECT * FROM tasks WHERE isDeleted = 0 and date == :currentDate")
+    suspend fun allTasks(currentDate: String): MutableList<Task?>?
 
     @Query("SELECT DISTINCT category FROM tasks")
     suspend fun getCategories(): List<String>

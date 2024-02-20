@@ -11,7 +11,7 @@ import com.example.neotaskmanager.data.model.Converters
 import com.example.neotaskmanager.data.model.Task
 import com.example.neotaskmanager.data.model.TaskData
 
-@Database(entities = [Task::class, TaskData::class], version = 4, exportSchema = false)
+@Database(entities = [Task::class, TaskData::class], version = 5, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class TaskDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao?
@@ -30,14 +30,6 @@ abstract class TaskDatabase : RoomDatabase() {
                     .build()
                 INSTANCE = instance
                 instance
-            }
-        }
-
-        val MIGRATION_1_2: Migration = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                // Your migration logic here
-                database.execSQL("ALTER TABLE tasks ADD COLUMN category_color INTEGER")
-                database.execSQL("ALTER TABLE tasks DROP COLUMN isSaved")
             }
         }
     }

@@ -30,6 +30,7 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
         fun onTaskItemClick(item: Task?)
         fun onSpinnerClickListener()
         fun onDeleteClick(item: Task?)
+        fun onSaveClick(item: Task?)
     }
 
     fun updateData(newList: MutableList<Task?>) {
@@ -165,9 +166,7 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
                 val subTasks = taskAdapter.items
                 val task = Task(0, category, categoryColor, subTasks)
 
-                lifecycleScope.launch {
-                    insertViewModel.insertTask(task)
-                }
+                itemClickListener?.onSaveClick(task)
             }
         }
 
@@ -223,6 +222,11 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
         notifyItemRemoved(position)
     }
 
+
+    fun deleteAllItems() {
+        items.clear()
+        notifyDataSetChanged()
+    }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {

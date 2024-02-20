@@ -46,7 +46,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
         return taskDao.getCategories()
     }
 
-    override suspend fun allTasks(): MutableList<Task?>? {
-        return taskDao.allTasks()
+    override suspend fun allTasks(currentDate: String): MutableList<Task?>? {
+        return taskDao.allTasks(currentDate)
     }
 }

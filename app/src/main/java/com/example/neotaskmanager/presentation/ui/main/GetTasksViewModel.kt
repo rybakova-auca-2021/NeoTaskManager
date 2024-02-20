@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.neotaskmanager.data.model.Task
 import com.example.neotaskmanager.data.repository.TaskRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class GetTasksViewModel(private val repository: TaskRepository) : ViewModel() {
@@ -14,10 +15,10 @@ class GetTasksViewModel(private val repository: TaskRepository) : ViewModel() {
         get() = _result
 
 
-    fun fetchTasks() {
-        viewModelScope.launch {
+    fun fetchTasks(currentDate: String) {
+        viewModelScope.launch(Dispatchers.Main) {
             try {
-                val tasks = repository.allTasks()
+                val tasks = repository.allTasks(currentDate)
                 _result.value = Result.success(tasks)
             } catch (e: Exception) {
                 _result.value = Result.failure(e)
