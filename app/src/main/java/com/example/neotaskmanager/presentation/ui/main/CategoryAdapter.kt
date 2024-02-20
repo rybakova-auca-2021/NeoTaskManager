@@ -27,8 +27,6 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
     }
 
     interface OnItemClickListener {
-        fun onTaskItemClick(item: Task?)
-        fun onSpinnerClickListener()
         fun onDeleteClick(item: Task?)
         fun onSaveClick(item: Task?)
     }
@@ -42,6 +40,13 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
         )
         items = newList
         diffResult.dispatchUpdatesTo(this)
+    }
+
+    fun filterByCategoryAndDate(category: String, date: String) {
+        val filteredList = items.filter { task ->
+            task?.category == category && task.date == date
+        }.toMutableList()
+        updateData(filteredList)
     }
 
     inner class TaskViewHolder(private val binding: ItemCategoryCardBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -117,7 +122,6 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     val clickedItem = items[position]
-                    itemClickListener?.onTaskItemClick(clickedItem)
                     val drawable = ContextCompat.getDrawable(binding.root.context, R.drawable.rounded_red_card_background)
                     binding.card.background = drawable
                     binding.btnDelete.visibility = View.VISIBLE

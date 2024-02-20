@@ -1,5 +1,6 @@
 package com.example.neotaskmanager.presentation.ui.main
 
+import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.util.Log
@@ -38,31 +39,32 @@ class MainPageFragment : Fragment() {
     private lateinit var adapter: CategoryAdapter
     private lateinit var recyclerView: RecyclerView
 
-
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMainPageBinding.inflate(inflater, container, false)
+        initViews()
+        return binding.root
+    }
+
+    private fun initViews() {
         (requireActivity() as MainActivity).showBtmNav()
         mPicker = binding.dayScrollDatePicker
         recyclerView = binding.rvTasks
-        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val date = arguments?.getString("selectedDate")
-        println("date = $date")
         setupRecyclerView()
         setCurrentMonth()
         setupNavigation()
-        getValue()
-        setupPopUpMenu()
         if (date != null) {
             getTasks(date)
+            setupPopUpMenu(date)
         }
+        getValue()
     }
 
     private fun setupRecyclerView() {
@@ -98,7 +100,7 @@ class MainPageFragment : Fragment() {
         taskViewModel.fetchTasks(currentDate)
         taskViewModel.result.observe(viewLifecycleOwner, Observer { result ->
             result.onSuccess { tasks ->
-                println("tasks: $tasks")
+                println("tasks by date: $tasks")
                 if (tasks != null) {
                     if (tasks.isEmpty()) {
                         binding.textNoTasks.visibility = View.VISIBLE
@@ -110,14 +112,13 @@ class MainPageFragment : Fragment() {
             }
         })
     }
-
-    private fun setupPopUpMenu() {
+    private fun setupPopUpMenu(currentDate: String) {
         lifecycleScope.launch {
             viewModel.fetchCategories()
             viewModel.result.observe(viewLifecycleOwner) { result ->
                 result.onSuccess { categories ->
                     if (categories.isNotEmpty()) {
-                        showCategoryMenu(categories)
+                        showCategoryMenu(categories, currentDate)
                     } else {
                         Snackbar.make(binding.root, "Категорий для фильтра нет", Snackbar.LENGTH_INDEFINITE)
                             .setActionTextColor(ContextCompat.getColor(requireContext(), R.color.yellow))
@@ -133,32 +134,40 @@ class MainPageFragment : Fragment() {
         }
     }
 
-    private fun showCategoryMenu(categories: List<String>) {
+    private fun showCategoryMenu(categories: List<String>, currentDate: String) {
         val spinner = binding.spinner
         val categoriesWithAll = mutableListOf("Все").apply { addAll(categories) }
 
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categoriesWithAll)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
+        val arrayAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categoriesWithAll)
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = arrayAdapter
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            @SuppressLint("NotifyDataSetChanged")
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val selectedCategory = categoriesWithAll[position]
-                // Handle category selection
+                if (selectedCategory == "Все") {
+                    observeTasks(currentDate)
+                } else {
+                    adapter.filterByCategoryAndDate(selectedCategory, currentDate)
+                    adapter.notifyDataSetChanged()
+                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                // Handle case where nothing is selected
+                observeTasks(currentDate)
             }
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
     private fun getValue() {
         mPicker.getSelectedDate { date ->
             date?.let {
                 val selectedDate = SimpleDateFormat("yyyy-MM-dd").format(date)
                 observeTasks(selectedDate)
                 setupAdapterClicks(selectedDate)
+                setupPopUpMenu(selectedDate)
             }
         }
     }
@@ -171,14 +180,6 @@ class MainPageFragment : Fragment() {
 
     private fun setupAdapterClicks(selectedDate: String) {
         adapter.setOnItemClickListener(object : CategoryAdapter.OnItemClickListener {
-            override fun onTaskItemClick(item: Task?) {
-                println("clicked")
-            }
-
-            override fun onSpinnerClickListener() {
-                println("on spinner clicked")
-            }
-
             override fun onDeleteClick(item: Task?) {
                 lifecycleScope.launch {
                     item?.let {
@@ -203,7 +204,6 @@ class MainPageFragment : Fragment() {
                 lifecycleScope.launch {
                     if (item != null) {
                         item.date = selectedDate
-                        println("item: $item")
                         insertTaskViewModel.insertTask(item)
                     }
                 }
