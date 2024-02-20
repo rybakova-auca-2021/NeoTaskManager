@@ -53,11 +53,16 @@ class MainPageFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val date = arguments?.getString("selectedDate")
+        println("date = $date")
         setupRecyclerView()
         setCurrentMonth()
         setupNavigation()
         getValue()
         setupPopUpMenu()
+        if (date != null) {
+            getTasks(date)
+        }
     }
 
     private fun setupRecyclerView() {
@@ -74,6 +79,11 @@ class MainPageFragment : Fragment() {
         addButton.setOnClickListener {
             addEmptyCard()
         }
+    }
+
+    private fun getTasks(date: String) {
+        observeTasks(date)
+        setupAdapterClicks(date)
     }
 
     private fun setCurrentMonth() {
