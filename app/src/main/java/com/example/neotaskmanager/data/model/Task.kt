@@ -32,6 +32,13 @@ data class TaskData(
     val title: String?,
     var completed: Boolean?,
 ) : Parcelable
+
+data class CategoryWithColor(
+    val category: String,
+    val categoryColor: Int
+)
+
+
 class Converters {
     @TypeConverter
     fun fromJson(value: String): MutableList<TaskData?> {

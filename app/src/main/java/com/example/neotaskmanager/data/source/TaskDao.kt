@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.example.neotaskmanager.data.model.CategoryWithColor
 import com.example.neotaskmanager.data.model.Task
 
 
@@ -26,6 +27,7 @@ interface TaskDao {
     @Query("SELECT * FROM tasks WHERE isDeleted = 0 and date == :currentDate")
     suspend fun allTasks(currentDate: String): MutableList<Task?>?
 
-    @Query("SELECT DISTINCT category FROM tasks")
-    suspend fun getCategories(): List<String>
+    @Query("SELECT DISTINCT category, categoryColor FROM tasks")
+    suspend fun getCategories(): List<CategoryWithColor>
+
 }

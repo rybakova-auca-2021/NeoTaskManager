@@ -1,5 +1,6 @@
 package com.example.neotaskmanager.data.repository
 
+import com.example.neotaskmanager.data.model.CategoryWithColor
 import com.example.neotaskmanager.data.model.Task
 import com.example.neotaskmanager.data.source.TaskDao
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +43,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
         return taskDao.deletedTasks()
     }
 
-    override suspend fun getCategories(): List<String> {
+    override suspend fun getCategories(): List<CategoryWithColor> {
         return taskDao.getCategories()
     }
 

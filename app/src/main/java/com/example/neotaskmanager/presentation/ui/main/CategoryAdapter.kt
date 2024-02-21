@@ -7,12 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.neotaskmanager.R
+import com.example.neotaskmanager.data.model.CategoryWithColor
 import com.example.neotaskmanager.data.model.Task
 import com.example.neotaskmanager.data.model.TaskData
 import com.example.neotaskmanager.databinding.ItemCategoryCardBinding
@@ -82,27 +84,17 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
         }
 
         private fun setupSpinner() {
-            val spinnerItems = arrayOf(
-                R.drawable.spinner_item_1, R.drawable.spinner_item_2,
-                R.drawable.spinner_item_3, R.drawable.spinner_item_4, R.drawable.spinner_item_5
+            val spinnerItems = arrayListOf(
+                CustomColorItem(R.drawable.spinner_item_1),
+                CustomColorItem(R.drawable.spinner_item_2),
+                CustomColorItem(R.drawable.spinner_item_3),
+                CustomColorItem(R.drawable.spinner_item_4),
+                CustomColorItem(R.drawable.spinner_item_5)
             )
-            val adapter = object : ArrayAdapter<Int>(
-                binding.root.context, R.layout.item_circle, spinnerItems
-            ) {
-                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                    val view =
-                        convertView ?: LayoutInflater.from(context).inflate(R.layout.item_circle, parent, false)
-                    val drawable = ContextCompat.getDrawable(binding.root.context, spinnerItems[position])
-                    view.background = drawable
-                    return view
-                }
 
-                override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-                    return getView(position, convertView, parent)
-                }
-            }
+            val customAdapter = CustomColorAdapter(binding.root.context, R.layout.custom_color_spinner_layout, spinnerItems)
+            binding.spinner.adapter = customAdapter
 
-            binding.spinner.adapter = adapter
             binding.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
                     parent: AdapterView<*>?,
@@ -110,7 +102,7 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
                     position: Int,
                     id: Long
                 ) {
-                    color = spinnerItems[position]
+                    color = spinnerItems[position].spinnerImage
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -182,7 +174,18 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
 
         fun bind(item: Task?) {
             binding.cardTasksInProcess.visibility = View.GONE
-
+            if (item?.category == null) {
+                binding.categoryName.visibility = View.VISIBLE
+                binding.spinner.visibility = View.VISIBLE
+                binding.nameCategory.visibility = View.GONE
+                binding.iconImg.visibility = View.GONE
+            } else {
+                binding.categoryName.visibility = View.GONE
+                binding.spinner.visibility = View.GONE
+                binding.nameCategory.visibility = View.VISIBLE
+                binding.iconImg.visibility = View.VISIBLE
+                binding.addTaskBtn.visibility = View.GONE
+            }
             binding.addTaskBtn.setOnClickListener {
                 binding.cardTasksInProcess.visibility = View.VISIBLE
                 val emptyTask = TaskData(0, "your task", false)
@@ -201,7 +204,8 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
             binding.rvTasks.adapter = taskAdapter
             taskAdapter.attachItemTouchHelper(binding.rvTasks)
             item?.subTasks?.let { taskAdapter.updateData(it) }
-            binding.categoryName.text = item?.category.toEditable()
+            binding.nameCategory.text = item?.category
+            item?.categoryColor?.let { binding.iconImg.setImageResource(it) }
         }
     }
 

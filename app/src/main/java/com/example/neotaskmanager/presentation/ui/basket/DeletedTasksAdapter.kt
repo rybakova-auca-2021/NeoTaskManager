@@ -61,6 +61,7 @@ class DeletedTasksAdapter(var items: MutableList<Task?>, val restoreViewModel: D
             taskAdapter.attachItemTouchHelper(binding.rvTasks)
             item?.subTasks?.let { taskAdapter.updateData(it) }
             binding.categoryName.text = item?.category.toEditable()
+            item?.categoryColor?.let { binding.imageView.setImageResource(it) }
 
             binding.btnRestore.setOnClickListener {
                 if (item != null) {

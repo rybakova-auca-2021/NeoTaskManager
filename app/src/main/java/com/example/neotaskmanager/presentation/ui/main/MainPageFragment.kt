@@ -17,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.neotaskmanager.R
+import com.example.neotaskmanager.data.model.CategoryWithColor
 import com.example.neotaskmanager.data.model.Task
 import com.example.neotaskmanager.databinding.FragmentMainPageBinding
 import com.example.neotaskmanager.presentation.MainActivity
@@ -134,18 +135,17 @@ class MainPageFragment : Fragment() {
         }
     }
 
-    private fun showCategoryMenu(categories: List<String>, currentDate: String) {
+    private fun showCategoryMenu(categoriesWithColors: List<CategoryWithColor>, currentDate: String) {
         val spinner = binding.spinner
-        val categoriesWithAll = mutableListOf("Все").apply { addAll(categories) }
+        val categoriesWithAll = mutableListOf(CategoryWithColor("Все", R.drawable.spinner_item_1)).apply { addAll(categoriesWithColors) }
 
-        val arrayAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categoriesWithAll)
-        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = arrayAdapter
+        val customAdapter = CustomAdapter(requireContext(), R.layout.custom_spinner_layout, getCustomItems(categoriesWithAll))
+        spinner.adapter = customAdapter
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             @SuppressLint("NotifyDataSetChanged")
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val selectedCategory = categoriesWithAll[position]
+                val selectedCategory = categoriesWithAll[position].category
                 if (selectedCategory == "Все") {
                     observeTasks(currentDate)
                 } else {
@@ -159,6 +159,15 @@ class MainPageFragment : Fragment() {
             }
         }
     }
+
+    private fun getCustomItems(categoriesWithColors: List<CategoryWithColor>): ArrayList<CustomItem> {
+        val customItems = ArrayList<CustomItem>()
+        for (categoryWithColor in categoriesWithColors) {
+            customItems.add(CustomItem(categoryWithColor.category, categoryWithColor.categoryColor))
+        }
+        return customItems
+    }
+
 
     @SuppressLint("SimpleDateFormat")
     private fun getValue() {
@@ -203,6 +212,7 @@ class MainPageFragment : Fragment() {
             override fun onSaveClick(item: Task?) {
                 lifecycleScope.launch {
                     if (item != null) {
+                        println("item: $item")
                         item.date = selectedDate
                         insertTaskViewModel.insertTask(item)
                     }

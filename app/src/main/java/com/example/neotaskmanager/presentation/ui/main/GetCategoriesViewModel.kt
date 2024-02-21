@@ -4,13 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.neotaskmanager.data.model.CategoryWithColor
 import com.example.neotaskmanager.data.repository.TaskRepository
 import kotlinx.coroutines.launch
 
 class GetCategoriesViewModel(private val repository: TaskRepository) : ViewModel() {
 
-    private val _result = MutableLiveData<Result<List<String>>>()
-    val result: LiveData<Result<List<String>>>
+    private val _result = MutableLiveData<Result<List<CategoryWithColor>>>()
+    val result: LiveData<Result<List<CategoryWithColor>>>
         get() = _result
 
     fun fetchCategories() {
