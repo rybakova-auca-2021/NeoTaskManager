@@ -4,12 +4,14 @@ import android.graphics.Paint
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.neotaskmanager.R
+import com.example.neotaskmanager.data.model.Task
 import com.example.neotaskmanager.data.model.TaskData
 import com.example.neotaskmanager.databinding.ItemCardTaskBinding
 import java.util.Collections
@@ -17,6 +19,16 @@ import java.util.Collections
 class TaskAdapter(var items: MutableList<TaskData?>) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>(){
 
     private var itemTouchHelper: ItemTouchHelper? = null
+    private var itemClickListener: OnItemClickListener? = null
+
+
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        itemClickListener = listener
+    }
+
+    interface OnItemClickListener {
+        fun onDeleteClick(item: TaskData?)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -37,6 +49,19 @@ class TaskAdapter(var items: MutableList<TaskData?>) : RecyclerView.Adapter<Task
         RecyclerView.ViewHolder(binding.root) {
 
         init {
+            binding.root.setOnClickListener {
+                binding.btnTaskDelete.visibility = View.VISIBLE
+                binding.btnTaskDelete.setOnClickListener {
+                    val position = adapterPosition
+                    if (position != RecyclerView.NO_POSITION) {
+                        val deletedItem = items[position]
+                        items.removeAt(position)
+                        notifyItemRemoved(position)
+                        itemClickListener?.onDeleteClick(deletedItem)
+                    }
+                }
+            }
+
             binding.etTask.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
