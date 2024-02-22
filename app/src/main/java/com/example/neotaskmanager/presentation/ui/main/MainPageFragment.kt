@@ -218,6 +218,13 @@ class MainPageFragment : Fragment() {
                     }
                 }
             }
+
+            override fun onUpdateClick(item: Task?) {
+                if (item != null) {
+                    println("item: $item")
+                    insertTaskViewModel.updateTask(item)
+                }
+            }
         })
     }
 

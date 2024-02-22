@@ -12,4 +12,10 @@ class InsertTaskViewModel(private val repository: TaskRepository) : ViewModel() 
             repository.insert(task)
         }
     }
+
+    fun updateTask(task: Task) {
+        viewModelScope.launch {
+            repository.update(task)
+        }
+    }
 }

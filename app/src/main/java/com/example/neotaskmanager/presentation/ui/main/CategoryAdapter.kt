@@ -33,6 +33,7 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
     interface OnItemClickListener {
         fun onDeleteClick(item: Task?)
         fun onSaveClick(item: Task?)
+        fun onUpdateClick(item: Task?)
     }
 
     fun updateData(newList: MutableList<Task?>) {
@@ -190,7 +191,7 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
                 binding.spinner.visibility = View.GONE
                 binding.nameCategory.visibility = View.VISIBLE
                 binding.iconImg.visibility = View.VISIBLE
-                binding.addTaskBtn.visibility = View.GONE
+                binding.addTaskBtn.visibility = View.VISIBLE
             }
             binding.addTaskBtn.setOnClickListener {
                 binding.cardTasksInProcess.visibility = View.VISIBLE
@@ -221,6 +222,14 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
 
             binding.nameCategory.text = item?.category
             item?.categoryColor?.let { binding.iconImg.setImageResource(it) }
+
+            binding.btnSave.visibility = View.GONE
+            binding.btnUpdate.visibility = View.VISIBLE
+            binding.btnUpdate.setOnClickListener {
+                val subTasks = taskAdapter.items
+                val updatedTask = item?.copy(subTasks = subTasks)
+                itemClickListener?.onUpdateClick(updatedTask)
+            }
         }
     }
 
