@@ -17,7 +17,7 @@ interface TaskDao {
     fun update(task: Task?)
 
     @Query("SELECT * FROM tasks WHERE id = :taskId")
-    suspend fun getTaskById(taskId: Long): Task?
+    suspend fun getTaskById(taskId: Long?): Task?
     @Query("SELECT * FROM tasks WHERE isDeleted = 1")
     suspend fun deletedTasks(): MutableList<Task?>?
 

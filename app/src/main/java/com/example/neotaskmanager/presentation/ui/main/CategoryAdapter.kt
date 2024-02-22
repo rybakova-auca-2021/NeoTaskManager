@@ -18,7 +18,9 @@ import com.example.neotaskmanager.data.model.CategoryWithColor
 import com.example.neotaskmanager.data.model.Task
 import com.example.neotaskmanager.data.model.TaskData
 import com.example.neotaskmanager.databinding.ItemCategoryCardBinding
+import com.google.common.base.Strings
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: InsertTaskViewModel, val deleteViewModel: DeleteTaskViewModel, private val lifecycleScope: LifecycleCoroutineScope) : RecyclerView.Adapter<CategoryAdapter.TaskViewHolder>(){
     private var itemClickListener: OnItemClickListener? = null
@@ -137,7 +139,7 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
         private fun setupAddTaskButton() {
             binding.addTaskBtn.setOnClickListener {
                 binding.cardTasksInProcess.visibility = View.VISIBLE
-                val emptyTask = TaskData(0, "your task", false)
+                val emptyTask = TaskData(0, "", false)
                 taskAdapter.items.add(emptyTask)
                 taskAdapter.notifyItemInserted(taskAdapter.items.size - 1)
             }
@@ -160,16 +162,20 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
                 val category = binding.categoryName.text.toString()
                 val categoryColor = color
                 val subTasks = taskAdapter.items
-                val task = Task(0, category, categoryColor, subTasks)
+                val task = Task(null, category, categoryColor, subTasks)
 
                 itemClickListener?.onSaveClick(task)
             }
         }
 
         private fun setupRecyclerView() {
-            binding.rvTasks.layoutManager = LinearLayoutManager(binding.root.context)
-            binding.rvTasks.adapter = taskAdapter
-            taskAdapter.attachItemTouchHelper(binding.rvTasks)
+            binding.recyclerViewInProgress.layoutManager = LinearLayoutManager(binding.root.context)
+            binding.recyclerViewInProgress.adapter = taskAdapter
+            taskAdapter.attachItemTouchHelper(binding.recyclerViewInProgress)
+
+            binding.recyclerViewCompleted.layoutManager = LinearLayoutManager(binding.root.context)
+            binding.recyclerViewCompleted.adapter = taskAdapter
+            taskAdapter.attachItemTouchHelper(binding.recyclerViewCompleted)
         }
 
         fun bind(item: Task?) {
@@ -188,10 +194,9 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
             }
             binding.addTaskBtn.setOnClickListener {
                 binding.cardTasksInProcess.visibility = View.VISIBLE
-                val emptyTask = TaskData(0, "your task", false)
+                val emptyTask = TaskData(0, "", false)
                 taskAdapter.items.add(emptyTask)
                 taskAdapter.notifyItemInserted(taskAdapter.items.size - 1)
-
             }
             binding.btnDelete.setOnClickListener {
                 itemClickListener?.onDeleteClick(item)
@@ -200,17 +205,32 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
             if (item?.subTasks != null) {
                 binding.cardTasksInProcess.visibility = View.VISIBLE
             }
-            binding.rvTasks.layoutManager = LinearLayoutManager(binding.root.context)
-            binding.rvTasks.adapter = taskAdapter
-            taskAdapter.attachItemTouchHelper(binding.rvTasks)
-            item?.subTasks?.let { taskAdapter.updateData(it) }
+
+            binding.recyclerViewInProgress.layoutManager = LinearLayoutManager(binding.root.context)
+            binding.recyclerViewInProgress.adapter = taskAdapter
+            taskAdapter.attachItemTouchHelper(binding.recyclerViewInProgress)
+            val filteredNotCompletedSubTasks = item?.subTasks.filterNotCompleted()
+            taskAdapter.updateData(filteredNotCompletedSubTasks)
+
+            binding.recyclerViewCompleted.layoutManager = LinearLayoutManager(binding.root.context)
+            val completedTaskAdapter = TaskAdapter(mutableListOf())
+            binding.recyclerViewCompleted.adapter = completedTaskAdapter
+            completedTaskAdapter.attachItemTouchHelper(binding.recyclerViewCompleted)
+            val filteredCompletedSubTasks = item?.subTasks.filterCompleted()
+            completedTaskAdapter.updateData(filteredCompletedSubTasks)
+
             binding.nameCategory.text = item?.category
             item?.categoryColor?.let { binding.iconImg.setImageResource(it) }
         }
     }
 
-    fun String?.toEditable(): Editable? {
-        return this?.let { Editable.Factory.getInstance().newEditable(this) }
+
+    fun List<TaskData?>?.filterCompleted(): MutableList<TaskData?> {
+        return this?.filter { it?.completed == true }?.toMutableList() ?: mutableListOf()
+    }
+
+    fun List<TaskData?>?.filterNotCompleted(): MutableList<TaskData?> {
+        return this?.filter { it?.completed == false }?.toMutableList() ?: mutableListOf()
     }
 
     fun moveToTop(position: Int) {

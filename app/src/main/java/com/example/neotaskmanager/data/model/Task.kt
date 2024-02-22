@@ -10,16 +10,17 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.RawValue
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.util.UUID
 
 
 @Parcelize
 @Entity(tableName = "tasks")
 data class Task(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
-    val category: String? = null,
-    val categoryColor: Int? = null,
-    val subTasks: @RawValue MutableList<TaskData?>? = null,
+    val id: Long? = null,
+    var category: String? = null,
+    var categoryColor: Int? = null,
+    var subTasks: @RawValue MutableList<TaskData?>? = null,
     var date: String? = null,
     var isDeleted: Boolean = false
 ) : Parcelable
@@ -28,7 +29,7 @@ data class Task(
 @Entity(tableName = "task_data")
 data class TaskData(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    val id: Long? = null,
     val title: String?,
     var completed: Boolean?,
 ) : Parcelable

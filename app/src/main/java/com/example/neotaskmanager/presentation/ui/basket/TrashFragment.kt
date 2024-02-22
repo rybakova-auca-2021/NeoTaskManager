@@ -56,7 +56,7 @@ class TrashFragment : Fragment() {
     private fun setupClickListener() {
         adapter.setOnItemClickListener(object: DeletedTasksAdapter.OnItemClickListener{
             override fun onRecoverClick(task: Task) {
-                deleteTaskViewModel.restoreTask(task.id)
+                task.id?.let { deleteTaskViewModel.restoreTask(it) }
                 adapter.items.remove(task)
                 val position = adapter.items.indexOf(task)
                 adapter.notifyItemRemoved(position)
@@ -65,7 +65,7 @@ class TrashFragment : Fragment() {
                     .setActionTextColor(ContextCompat.getColor(requireContext(), R.color.yellow))
                     .setAction("Отменить") {
                         lifecycleScope.launch {
-                            deleteTaskViewModel.deleteTask(task.id)
+                            task.id?.let { it1 -> deleteTaskViewModel.deleteTask(it1) }
                             adapter.items.add(task)
                             adapter.notifyItemInserted(adapter.items.size - 1)
                         }

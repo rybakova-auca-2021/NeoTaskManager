@@ -192,7 +192,7 @@ class MainPageFragment : Fragment() {
             override fun onDeleteClick(item: Task?) {
                 lifecycleScope.launch {
                     item?.let {
-                        deleteTaskViewModel.deleteTask(it.id)
+                        it.id?.let { it1 -> deleteTaskViewModel.deleteTask(it1) }
                     }
                 }
                 Snackbar.make(binding.root, "Заметка отправлена в корзину", Snackbar.LENGTH_SHORT)
@@ -200,7 +200,7 @@ class MainPageFragment : Fragment() {
                     .setAction("Отменить") {
                         lifecycleScope.launch {
                             if (item != null) {
-                                deleteTaskViewModel.restoreTask(item.id)
+                                item.id?.let { it1 -> deleteTaskViewModel.restoreTask(it1) }
                             }
                             adapter.items.add(item)
                             adapter.notifyItemInserted(adapter.items.size - 1)

@@ -58,12 +58,13 @@ class TaskAdapter(var items: MutableList<TaskData?>) : RecyclerView.Adapter<Task
                 binding.etTask.setTextColor(ContextCompat.getColor(binding.root.context, R.color.grey))
                 binding.etTask.paintFlags = binding.etTask.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
             }
-            binding.checkBox.isChecked = task?.completed == true
             binding.checkBox.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
+                    items[adapterPosition]?.completed = true
                     binding.etTask.setTextColor(ContextCompat.getColor(binding.root.context, R.color.grey))
                     binding.etTask.paintFlags = binding.etTask.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 } else {
+                    items[adapterPosition]?.completed = false
                     binding.etTask.setTextColor(ContextCompat.getColor(binding.root.context, R.color.black))
                     binding.etTask.paintFlags = binding.etTask.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                 }
