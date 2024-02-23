@@ -121,7 +121,7 @@ class MainPageFragment : Fragment() {
                     if (categories.isNotEmpty()) {
                         showCategoryMenu(categories, currentDate)
                     } else {
-                        Snackbar.make(binding.root, "Категорий для фильтра нет", Snackbar.LENGTH_INDEFINITE)
+                        Snackbar.make(binding.root, "Категорий для фильтра нет", Snackbar.LENGTH_SHORT)
                             .setActionTextColor(ContextCompat.getColor(requireContext(), R.color.yellow))
                             .setAction("Создать") {
                                 addEmptyCard()

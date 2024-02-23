@@ -60,6 +60,7 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
         private val taskAdapter = TaskAdapter(mutableListOf())
 
         init {
+            binding.btnSave.visibility = View.VISIBLE
             setupSpinner()
             setupClickListener()
             setupTextWatcher()
@@ -218,13 +219,27 @@ class CategoryAdapter(var items: MutableList<Task?>, val insertViewModel: Insert
             binding.recyclerViewCompleted.adapter = completedTaskAdapter
             completedTaskAdapter.attachItemTouchHelper(binding.recyclerViewCompleted)
             val filteredCompletedSubTasks = item?.subTasks.filterCompleted()
-            completedTaskAdapter.updateData(filteredCompletedSubTasks)
+            if (filteredCompletedSubTasks.isEmpty()) {
+                binding.textViewCompleted.visibility = View.GONE
+                binding.recyclerViewCompleted.visibility = View.GONE
+            } else {
+                binding.textViewCompleted.visibility = View.VISIBLE
+                binding.recyclerViewCompleted.visibility = View.VISIBLE
+                completedTaskAdapter.updateData(filteredCompletedSubTasks)
+            }
+
 
             binding.nameCategory.text = item?.category
             item?.categoryColor?.let { binding.iconImg.setImageResource(it) }
 
-            binding.btnSave.visibility = View.GONE
-            binding.btnUpdate.visibility = View.VISIBLE
+            if (item?.id != null) {
+                binding.btnSave.visibility = View.GONE
+                binding.btnUpdate.visibility = View.VISIBLE
+            } else {
+                binding.btnSave.visibility = View.VISIBLE
+                binding.btnUpdate.visibility = View.GONE
+            }
+
             binding.btnUpdate.setOnClickListener {
                 val subTasks = taskAdapter.items
                 val updatedTask = item?.copy(subTasks = subTasks)

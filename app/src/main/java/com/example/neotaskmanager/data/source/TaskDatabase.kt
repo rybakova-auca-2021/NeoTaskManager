@@ -9,7 +9,7 @@ import com.example.neotaskmanager.data.model.Converters
 import com.example.neotaskmanager.data.model.Task
 import com.example.neotaskmanager.data.model.TaskData
 
-@Database(entities = [Task::class, TaskData::class], version = 9, exportSchema = false)
+@Database(entities = [Task::class, TaskData::class], version = 11, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class TaskDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao?
